@@ -7,6 +7,8 @@
 //
 
 import XCTest
+import App
+
 @testable import TDD_iOS
 
 class TDD_iOSTests: XCTestCase {
@@ -22,6 +24,7 @@ class TDD_iOSTests: XCTestCase {
     func testExample() {
         // This is an example of a functional test case.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
+        XCTAssertEqual(App().text, "Hello, World!")
     }
 
     func testPerformanceExample() {
