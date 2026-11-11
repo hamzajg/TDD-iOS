@@ -1,0 +1,26 @@
+name: CI
+
+on:
+  push:
+    branches: [master]
+  pull_request:
+    branches: [master]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  swift-packages:
+    name: Swift packages (${{ matrix.package }})
+    runs-on: macos-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [Domain, App]
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Test ${{ matrix.package }}
+        working-directory: ${{ matrix.package }}
+        run: swift test
