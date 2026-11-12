@@ -53,6 +53,30 @@ final class StringCalculatorTests: XCTestCase {
         }
     }
 
+    func testMultiCharacterDelimiterIsSupported() throws {
+        XCTAssertEqual(try calculator.add("//[***]\n1***2***3"), 6)
+    }
+
+    func testMultipleDelimitersAreSupported() throws {
+        XCTAssertEqual(try calculator.add("//[*][%]\n1*2%3"), 6)
+    }
+
+    func testTheLongestDelimiterWins() throws {
+        XCTAssertEqual(try calculator.add("//[**]\n1**2"), 3)
+    }
+
+    func testUnclosedBracketedDelimiterIsRejected() {
+        XCTAssertThrowsError(try calculator.add("//[***\n1")) { error in
+            XCTAssertEqual(error as? StringCalculatorError, .invalidDelimiter)
+        }
+    }
+
+    func testEmptyBracketedDelimiterIsRejected() {
+        XCTAssertThrowsError(try calculator.add("//[]\n1")) { error in
+            XCTAssertEqual(error as? StringCalculatorError, .invalidDelimiter)
+        }
+    }
+
     func testNumbersGreaterThanOneThousandAreIgnored() throws {
         XCTAssertEqual(try calculator.add("2,1001"), 2)
     }
@@ -71,6 +95,11 @@ final class StringCalculatorTests: XCTestCase {
         ("testCustomDelimiterIsSupported", testCustomDelimiterIsSupported),
         ("testNegativeNumbersAreRejected", testNegativeNumbersAreRejected),
         ("testEveryNegativeNumberIsReported", testEveryNegativeNumberIsReported),
+        ("testMultiCharacterDelimiterIsSupported", testMultiCharacterDelimiterIsSupported),
+        ("testMultipleDelimitersAreSupported", testMultipleDelimitersAreSupported),
+        ("testTheLongestDelimiterWins", testTheLongestDelimiterWins),
+        ("testUnclosedBracketedDelimiterIsRejected", testUnclosedBracketedDelimiterIsRejected),
+        ("testEmptyBracketedDelimiterIsRejected", testEmptyBracketedDelimiterIsRejected),
         ("testNumbersGreaterThanOneThousandAreIgnored", testNumbersGreaterThanOneThousandAreIgnored),
         ("testOneThousandIsIncluded", testOneThousandIsIncluded),
     ]
