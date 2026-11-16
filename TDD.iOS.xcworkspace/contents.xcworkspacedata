@@ -10,7 +10,4 @@
    <FileRef
       location = "group:TDD.iOS.xcodeproj">
    </FileRef>
-   <FileRef
-      location = "group:Pods/Pods.xcodeproj">
-   </FileRef>
 </Workspace>

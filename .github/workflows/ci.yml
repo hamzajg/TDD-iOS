@@ -24,3 +24,22 @@ jobs:
       - name: Test ${{ matrix.package }}
         working-directory: ${{ matrix.package }}
         run: swift test
+
+  xcode-app:
+    name: Xcode app (build)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # Compiles the app shell and its SwiftPM dependency (App -> Domain).
+      # Uses -target rather than -scheme: no scheme is shared, and this
+      # avoids needing a booted simulator runtime.
+      - name: Build TDD.iOS
+        run: |
+          xcodebuild \
+            -project TDD.iOS.xcodeproj \
+            -target TDD.iOS \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            CODE_SIGNING_ALLOWED=NO \
+            build

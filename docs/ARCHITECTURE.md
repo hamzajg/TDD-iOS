@@ -23,8 +23,12 @@ TDD-iOS/   (Xcode workspace + two SwiftPM packages)
 ├── TDD.iOS/              app target sources (AppDelegate, ViewController…)
 ├── TDD.iOSTests/         unit test target (template)
 ├── TDD.iOSUITests/       UI test target (template)
-└── Podfile               stub — no pods
+└── Podfile               stub — no pods, not wired into the project
 ```
+
+The app target consumes `App` as a **local SwiftPM package**
+(`XCLocalSwiftPackageReference` → `App`) that transitively pulls in
+`Domain`; the Xcode project has no CocoaPods wiring.
 
 ## Design
 
@@ -39,5 +43,9 @@ TDD-iOS/   (Xcode workspace + two SwiftPM packages)
 
 ## Verification
 
-CI: `swift test` per package on `macos-latest` (matrix: Domain, App).
+CI on `macos-latest`:
+- `swift test` per package (matrix: Domain, App).
+- `xcodebuild -target TDD.iOS -sdk iphonesimulator build` — compiles the
+  app shell and its `App`/`Domain` package dependency.
+
 Xcode path: `Cmd-U` in the workspace — needs a matching simulator runtime.
