@@ -14,12 +14,13 @@ Stack: Swift 5 (`swift-tools-version:5.2`), SwiftPM packages `Domain/` +
 
 ## Commands
 
-Verified 2026-11-13 against CI (`.github/workflows/ci.yml`) and README.
+Verified 2026-11-16 against CI (`.github/workflows/ci.yml`) and README.
 
 | Task | Command |
 |---|---|
 | Domain tests | `cd Domain && swift test` (17 tests) |
 | App tests | `cd ../App && swift test` |
+| App build | `xcodebuild -project TDD.iOS.xcodeproj -target TDD.iOS -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build` |
 | Xcode tests | open `TDD.iOS.xcworkspace` → `Cmd-U` (needs simulator matching deployment target) |
 
 Requires: **macOS + Swift toolchain** — CI runs `macos-latest`. No external
@@ -40,10 +41,13 @@ TDD.iOS.xcworkspace     app target + test targets (Xcode project)
 ├── TDD.iOS/            app sources: AppDelegate, ViewController, assets
 ├── TDD.iOSTests/       unit test target (template)
 ├── TDD.iOSUITests/     UI test target (template)
-└── Podfile             CocoaPods stub — no pods declared
+└── Podfile             CocoaPods stub — no pods, not wired into the project
 ```
 
 `App` depends on `Domain` (check `App/Package.swift` for the path dep).
+The app target consumes `App` as a local SwiftPM package
+(`XCLocalSwiftPackageReference` in `project.pbxproj`); the Xcode project
+has no CocoaPods wiring.
 
 ## The kata rules (the spec)
 
@@ -72,8 +76,14 @@ separators; `//<d>\n` custom delimiter; bracketed `//[***]\n` and multi
   Xcode workspace can't build on Linux/Windows.
 - Deployment target vs installed simulator runtimes — `Cmd-U` fails if no
   matching runtime; packages avoid this entirely.
-- `Podfile` is a stub with no pods — `pod install` isn't needed for the
-  packages; don't add pods casually.
+- `Podfile` is a stub with no pods — the Xcode project no longer wires
+  CocoaPods (no `[CP]` phases, no `Pods/*.xcconfig`); `pod install` isn't
+  needed and re-adding pods is a deliberate change, not a tweak.
+- The app target's `xcodebuild -target` build compiles storyboards with
+  `ibtool`, which needs the **iOS platform installed** — it fails with
+  "iOS <ver> Platform Not Installed" on an Xcode whose platform components
+  aren't installed. No scheme is shared, so CI builds with `-target`, not
+  `-scheme`.
 - `.build/` dirs are committed?? — check `git status`; build output should
   stay untracked (`Domain/.build`, `App/.build` exist locally).
 - `Domain.swift`/`App.swift` may hold package example tests — check before

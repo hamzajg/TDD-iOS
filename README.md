@@ -53,10 +53,22 @@ The Xcode workspace can also be opened in Xcode and tested with
 `Cmd-U`, provided a simulator runtime matching the project's deployment
 target is installed.
 
+The app target links the local `App` SwiftPM package. You can check that it
+still compiles without opening Xcode:
+
+```bash
+xcodebuild -project TDD.iOS.xcodeproj -target TDD.iOS \
+  -sdk iphonesimulator -configuration Debug CODE_SIGNING_ALLOWED=NO build
+```
+
 ## Continuous integration
 
-[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs `swift test` for
-both packages on `macos-latest` for every push and pull request to `master`.
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs on `macos-latest`
+for every push and pull request to `master`:
+
+- **Swift packages** — `swift test` for `Domain` and `App`.
+- **Xcode app** — `xcodebuild` builds the `TDD.iOS` app target, which
+  compiles the app shell and its `App`/`Domain` package dependency.
 
 ## License
 
